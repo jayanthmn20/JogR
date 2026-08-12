@@ -41,10 +41,16 @@ class JogRApp(App):
         return manager
 
     def go_to_run(self, manager):
-        manager.current = "run"
+         manager.current = "run"
+
+         run_screen = manager.get_screen("run")
+         run_screen.children[0].start_timer()
 
     def go_to_result(self, manager):
-        manager.current = "result"
+         run_screen = manager.get_screen("run")
+
+         run_screen.children[0].stop_timer()
+         manager.current = "result"
 
     def go_to_home(self, manager):
         manager.current = "home"

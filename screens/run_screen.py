@@ -1,3 +1,4 @@
+from kivy.clock import Clock
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
@@ -13,14 +14,16 @@ class RunScreen(BoxLayout):
             **kwargs
         )
 
+        self.seconds = 0
+
         title = Label(
             text="RUNNING",
             font_size=40
         )
 
         self.time_label = Label(
-            text="Time: 00:00",
-            font_size=25
+            text="00:00",
+            font_size=40
         )
 
         self.distance_label = Label(
@@ -47,3 +50,28 @@ class RunScreen(BoxLayout):
         self.add_widget(self.distance_label)
         self.add_widget(self.pace_label)
         self.add_widget(stop_button)
+
+    def start_timer(self):
+        self.seconds = 0
+
+        self.update_time(0)
+
+        Clock.unschedule(self.update_time)
+
+        Clock.schedule_interval(
+            self.update_time,
+            1
+        )
+
+    def stop_timer(self):
+        Clock.unschedule(self.update_time)
+
+    def update_time(self, dt):
+        self.seconds += 1
+
+        minutes = self.seconds // 60
+        seconds = self.seconds % 60
+
+        self.time_label.text = (
+            f"{minutes:02d}:{seconds:02d}"
+        )

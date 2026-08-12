@@ -94,4 +94,30 @@ class RunScreen(BoxLayout):
                 f"Pace: {pace_minutes:02d}:"
                 f"{pace_seconds:02d} /km"
             )
-            
+
+    def get_results(self):
+        minutes = self.seconds // 60
+        seconds = self.seconds % 60
+
+        time = f"{minutes:02d}:{seconds:02d}"
+
+        if self.distance > 0:
+
+            pace = self.seconds / self.distance
+
+            pace_minutes = int(pace // 60)
+            pace_seconds = int(pace % 60)
+
+            pace_text = (
+                f"{pace_minutes:02d}:"
+                f"{pace_seconds:02d} /km"
+            )
+
+        else:
+            pace_text = "--:-- /km"
+
+        xp = int(self.distance * 100)
+
+        return time, self.distance, pace_text, xp
+    
+

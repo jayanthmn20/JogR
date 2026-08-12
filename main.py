@@ -47,10 +47,24 @@ class JogRApp(App):
          run_screen.children[0].start_timer()
 
     def go_to_result(self, manager):
-         run_screen = manager.get_screen("run")
 
-         run_screen.children[0].stop_timer()
-         manager.current = "result"
+        run_screen = manager.get_screen("run")
+        result_screen = manager.get_screen("result")
+
+        run_screen.children[0].stop_timer()
+
+        time, distance, pace, xp = (
+            run_screen.children[0].get_results()
+        )
+
+        result_screen.children[0].show_results(
+            time,
+            distance,
+            pace,
+            xp
+        )
+
+        manager.current = "result"
 
     def go_to_home(self, manager):
         manager.current = "home"

@@ -24,6 +24,7 @@ class JogRApp(App):
 
         home_screen.add_widget(
             HomeScreen(
+                player=self.player,
                 go_to_run_screen=lambda instance: self.go_to_run(manager)
             )
         )
@@ -79,6 +80,10 @@ class JogRApp(App):
         manager.current = "result"
 
     def go_to_home(self, manager):
+
+        home_screen = manager.get_screen("home")
+
+        home_screen.children[0].update_stats()
 
         manager.current = "home"
 

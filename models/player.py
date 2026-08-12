@@ -3,7 +3,7 @@ class Player:
     def __init__(self, name="Jayanth"):
         self.name = name
         self.level = 1
-        self.xp = 95
+        self.xp = 0
         self.total_distance = 0.0
         self.total_runs = 0
 

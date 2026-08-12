@@ -4,3 +4,4 @@ __pycache__/
 .kivy/
 .env
 *.log
+player_data.json

@@ -5,6 +5,7 @@ from screens.home_screen import HomeScreen
 from screens.run_screen import RunScreen
 from screens.result_screen import ResultScreen
 from models.player import Player
+from services.storage import save_player, load_player
 
 
 class JogRApp(App):
@@ -12,7 +13,19 @@ class JogRApp(App):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.player = Player()
+        saved_data = load_player()
+
+        if saved_data:
+            self.player = Player(
+                name=saved_data["name"]
+            )
+
+            self.player.level = saved_data["level"]
+            self.player.xp = saved_data["xp"]
+            self.player.total_distance = saved_data["total_distance"]
+            self.player.total_runs = saved_data["total_runs"]
+        else:
+            self.player = Player()
 
     def build(self):
 
@@ -69,6 +82,8 @@ class JogRApp(App):
             distance,
             xp
         )
+        
+        save_player(self.player)
 
         result_screen.children[0].show_results(
             time,

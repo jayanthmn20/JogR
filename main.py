@@ -4,6 +4,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from screens.home_screen import HomeScreen
 from screens.run_screen import RunScreen
 from screens.result_screen import ResultScreen
+
 from models.player import Player
 from services.storage import save_player, load_player
 
@@ -24,8 +25,13 @@ class JogRApp(App):
             self.player.xp = saved_data["xp"]
             self.player.total_distance = saved_data["total_distance"]
             self.player.total_runs = saved_data["total_runs"]
+
         else:
             self.player = Player()
+
+        self.home_widget = None
+        self.run_widget = None
+        self.result_widget = None
 
     def build(self):
 
@@ -35,24 +41,22 @@ class JogRApp(App):
         run_screen = Screen(name="run")
         result_screen = Screen(name="result")
 
-        home_screen.add_widget(
-            HomeScreen(
-                player=self.player,
-                go_to_run_screen=lambda instance: self.go_to_run(manager)
-            )
+        self.home_widget = HomeScreen(
+            player=self.player,
+            go_to_run_screen=lambda instance: self.go_to_run(manager)
         )
 
-        run_screen.add_widget(
-            RunScreen(
-                go_to_result_screen=lambda instance: self.go_to_result(manager)
-            )
+        self.run_widget = RunScreen(
+            go_to_result_screen=lambda instance: self.go_to_result(manager)
         )
 
-        result_screen.add_widget(
-            ResultScreen(
-                go_to_home_screen=lambda instance: self.go_to_home(manager)
-            )
+        self.result_widget = ResultScreen(
+            go_to_home_screen=lambda instance: self.go_to_home(manager)
         )
+
+        home_screen.add_widget(self.home_widget)
+        run_screen.add_widget(self.run_widget)
+        result_screen.add_widget(self.result_widget)
 
         manager.add_widget(home_screen)
         manager.add_widget(run_screen)
@@ -64,28 +68,24 @@ class JogRApp(App):
 
         manager.current = "run"
 
-        run_screen = manager.get_screen("run")
-        run_screen.children[0].start_timer()
+        self.run_widget.start_timer()
 
     def go_to_result(self, manager):
 
-        run_screen = manager.get_screen("run")
-        result_screen = manager.get_screen("result")
-
-        run_screen.children[0].stop_timer()
+        self.run_widget.stop_timer()
 
         time, distance, pace, xp = (
-            run_screen.children[0].get_results()
+            self.run_widget.get_results()
         )
 
         self.player.add_run(
             distance,
             xp
         )
-        
+
         save_player(self.player)
 
-        result_screen.children[0].show_results(
+        self.result_widget.show_results(
             time,
             distance,
             pace,
@@ -96,9 +96,7 @@ class JogRApp(App):
 
     def go_to_home(self, manager):
 
-        home_screen = manager.get_screen("home")
-
-        home_screen.children[0].update_stats()
+        self.home_widget.update_stats()
 
         manager.current = "home"
 

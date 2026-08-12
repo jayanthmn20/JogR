@@ -4,9 +4,15 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from screens.home_screen import HomeScreen
 from screens.run_screen import RunScreen
 from screens.result_screen import ResultScreen
+from models.player import Player
 
 
 class JogRApp(App):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.player = Player()
 
     def build(self):
 
@@ -41,10 +47,11 @@ class JogRApp(App):
         return manager
 
     def go_to_run(self, manager):
-         manager.current = "run"
 
-         run_screen = manager.get_screen("run")
-         run_screen.children[0].start_timer()
+        manager.current = "run"
+
+        run_screen = manager.get_screen("run")
+        run_screen.children[0].start_timer()
 
     def go_to_result(self, manager):
 
@@ -57,6 +64,11 @@ class JogRApp(App):
             run_screen.children[0].get_results()
         )
 
+        self.player.add_run(
+            distance,
+            xp
+        )
+
         result_screen.children[0].show_results(
             time,
             distance,
@@ -67,6 +79,7 @@ class JogRApp(App):
         manager.current = "result"
 
     def go_to_home(self, manager):
+
         manager.current = "home"
 
 

@@ -15,6 +15,7 @@ class RunScreen(BoxLayout):
         )
 
         self.seconds = 0
+        self.distance = 0.0
 
         title = Label(
             text="RUNNING",
@@ -52,15 +53,16 @@ class RunScreen(BoxLayout):
         self.add_widget(stop_button)
 
     def start_timer(self):
-        self.seconds = 0
+         self.seconds = 0
+         self.distance = 0.0
 
-        self.update_time(0)
+         self.update_time(0)
 
-        Clock.unschedule(self.update_time)
+         Clock.unschedule(self.update_time)
 
-        Clock.schedule_interval(
-            self.update_time,
-            1
+         Clock.schedule_interval(
+             self.update_time,
+             1
         )
 
     def stop_timer(self):
@@ -75,3 +77,21 @@ class RunScreen(BoxLayout):
         self.time_label.text = (
             f"{minutes:02d}:{seconds:02d}"
         )
+
+        self.distance = self.seconds * 0.002
+        self.distance_label.text = (
+            f"Distance: {self.distance:.2f} km"
+        )
+
+        if self.distance > 0:
+
+            pace = self.seconds / self.distance
+
+            pace_minutes = int(pace // 60)
+            pace_seconds = int(pace % 60)
+
+            self.pace_label.text = (
+                f"Pace: {pace_minutes:02d}:"
+                f"{pace_seconds:02d} /km"
+            )
+            

@@ -3,6 +3,9 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 
+from services.location_service import LocationService
+from services.gps_service import GPSService
+
 
 class RunScreen(BoxLayout):
 
@@ -16,6 +19,12 @@ class RunScreen(BoxLayout):
 
         self.seconds = 0
         self.distance = 0.0
+
+        self.location_service = LocationService()
+
+        self.gps_service = GPSService(
+            on_location=self.on_location
+        )
 
         title = Label(
             text="RUNNING",
@@ -53,20 +62,43 @@ class RunScreen(BoxLayout):
         self.add_widget(stop_button)
 
     def start_timer(self):
-         self.seconds = 0
-         self.distance = 0.0
+        self.seconds = 0
+        self.distance = 0.0
 
-         self.update_time(0)
+        self.location_service.start()
+        self.gps_service.start()
 
-         Clock.unschedule(self.update_time)
+        self.update_time(0)
 
-         Clock.schedule_interval(
-             self.update_time,
-             1
+        Clock.unschedule(self.update_time)
+
+        Clock.schedule_interval(
+            self.update_time,
+            1
         )
 
     def stop_timer(self):
         Clock.unschedule(self.update_time)
+
+        self.gps_service.stop()
+        self.location_service.stop()
+
+    def on_location(
+        self,
+        **kwargs
+    ):
+        latitude = kwargs.get("lat")
+        longitude = kwargs.get("lon")
+
+        if latitude is None or longitude is None:
+            return
+
+        self.location_service.update_location(
+            latitude,
+            longitude
+        )
+
+        self.distance = self.location_service.get_distance()
 
     def update_time(self, dt):
         self.seconds += 1
@@ -78,7 +110,10 @@ class RunScreen(BoxLayout):
             f"{minutes:02d}:{seconds:02d}"
         )
 
-        self.distance = self.seconds * 0.002
+        self.distance = (
+            self.location_service.get_distance()
+        )
+
         self.distance_label.text = (
             f"Distance: {self.distance:.2f} km"
         )
@@ -119,5 +154,3 @@ class RunScreen(BoxLayout):
         xp = int(self.distance * 100)
 
         return time, self.distance, pace_text, xp
-    
-

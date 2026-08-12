@@ -1,39 +1,53 @@
 from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
-from kivy.uix.label import Label
+from kivy.uix.screenmanager import ScreenManager, Screen
+
+from screens.home_screen import HomeScreen
+from screens.run_screen import RunScreen
+from screens.result_screen import ResultScreen
 
 
 class JogRApp(App):
 
     def build(self):
 
-        layout = BoxLayout(
-            orientation="vertical",
-            padding=50,
-            spacing=30
+        manager = ScreenManager()
+
+        home_screen = Screen(name="home")
+        run_screen = Screen(name="run")
+        result_screen = Screen(name="result")
+
+        home_screen.add_widget(
+            HomeScreen(
+                go_to_run_screen=lambda instance: self.go_to_run(manager)
+            )
         )
 
-        title = Label(
-            text="JogR",
-            font_size=50
+        run_screen.add_widget(
+            RunScreen(
+                go_to_result_screen=lambda instance: self.go_to_result(manager)
+            )
         )
 
-        tagline = Label(
-            text="Run. Level Up. Become Better.",
-            font_size=20
+        result_screen.add_widget(
+            ResultScreen(
+                go_to_home_screen=lambda instance: self.go_to_home(manager)
+            )
         )
 
-        start_button = Button(
-            text="START RUN",
-            font_size=25
-        )
+        manager.add_widget(home_screen)
+        manager.add_widget(run_screen)
+        manager.add_widget(result_screen)
 
-        layout.add_widget(title)
-        layout.add_widget(tagline)
-        layout.add_widget(start_button)
+        return manager
 
-        return layout
+    def go_to_run(self, manager):
+        manager.current = "run"
+
+    def go_to_result(self, manager):
+        manager.current = "result"
+
+    def go_to_home(self, manager):
+        manager.current = "home"
 
 
 if __name__ == "__main__":

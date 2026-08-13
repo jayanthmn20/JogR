@@ -83,10 +83,9 @@ class RunScreen(BoxLayout):
         self.gps_service.stop()
         self.location_service.stop()
 
-    def on_location(
-        self,
-        **kwargs
-    ):
+    def on_location(self, **kwargs):
+        print("GPS LOCATION:", kwargs)
+
         latitude = kwargs.get("lat")
         longitude = kwargs.get("lon")
 
@@ -99,6 +98,7 @@ class RunScreen(BoxLayout):
         )
 
         self.distance = self.location_service.get_distance()
+
 
     def update_time(self, dt):
         self.seconds += 1

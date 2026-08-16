@@ -2,8 +2,8 @@ from kivy.clock import Clock
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
+from jnius import autoclass
 
-from services.location_service import LocationService
 from services.gps_service import GPSService
 
 
@@ -19,8 +19,7 @@ class RunScreen(BoxLayout):
 
         self.seconds = 0
         self.distance = 0.0
-
-        self.location_service = LocationService()
+        self.start_time_ms = None
 
         self.gps_service = GPSService(
             on_location=self.on_location
@@ -62,15 +61,25 @@ class RunScreen(BoxLayout):
         self.add_widget(stop_button)
 
     def start_timer(self):
+
         self.seconds = 0
         self.distance = 0.0
 
-        self.location_service.start()
+        SystemClock = autoclass(
+            "android.os.SystemClock"
+        )
+
+        self.start_time_ms = (
+            SystemClock.elapsedRealtime()
+        )
+
         self.gps_service.start()
 
         self.update_time(0)
 
-        Clock.unschedule(self.update_time)
+        Clock.unschedule(
+            self.update_time
+        )
 
         Clock.schedule_interval(
             self.update_time,
@@ -78,30 +87,49 @@ class RunScreen(BoxLayout):
         )
 
     def stop_timer(self):
-        Clock.unschedule(self.update_time)
 
-        self.gps_service.stop()
-        self.location_service.stop()
+        self.update_time(0)
 
-    def on_location(self, **kwargs):
-        print("GPS LOCATION:", kwargs)
-
-        latitude = kwargs.get("lat")
-        longitude = kwargs.get("lon")
-
-        if latitude is None or longitude is None:
-            return
-
-        self.location_service.update_location(
-            latitude,
-            longitude
+        Clock.unschedule(
+            self.update_time
         )
 
-        self.distance = self.location_service.get_distance()
+        self.gps_service.stop()
 
+        self.distance = (
+            self.gps_service.get_distance()
+        )
+
+    def on_location(self, **kwargs):
+
+        print(
+            "GPS LOCATION:",
+            kwargs
+        )
+
+        self.distance = (
+            self.gps_service.get_distance()
+        )
 
     def update_time(self, dt):
-        self.seconds += 1
+
+        if self.start_time_ms is None:
+            return
+
+        SystemClock = autoclass(
+            "android.os.SystemClock"
+        )
+
+        current_time_ms = (
+            SystemClock.elapsedRealtime()
+        )
+
+        self.seconds = int(
+            (
+                current_time_ms
+                - self.start_time_ms
+            ) / 1000
+        )
 
         minutes = self.seconds // 60
         seconds = self.seconds % 60
@@ -111,7 +139,7 @@ class RunScreen(BoxLayout):
         )
 
         self.distance = (
-            self.location_service.get_distance()
+            self.gps_service.get_distance()
         )
 
         self.distance_label.text = (
@@ -120,10 +148,18 @@ class RunScreen(BoxLayout):
 
         if self.distance > 0:
 
-            pace = self.seconds / self.distance
+            pace = (
+                self.seconds
+                / self.distance
+            )
 
-            pace_minutes = int(pace // 60)
-            pace_seconds = int(pace % 60)
+            pace_minutes = int(
+                pace // 60
+            )
+
+            pace_seconds = int(
+                pace % 60
+            )
 
             self.pace_label.text = (
                 f"Pace: {pace_minutes:02d}:"
@@ -131,17 +167,28 @@ class RunScreen(BoxLayout):
             )
 
     def get_results(self):
+
         minutes = self.seconds // 60
         seconds = self.seconds % 60
 
-        time = f"{minutes:02d}:{seconds:02d}"
+        time = (
+            f"{minutes:02d}:{seconds:02d}"
+        )
 
         if self.distance > 0:
 
-            pace = self.seconds / self.distance
+            pace = (
+                self.seconds
+                / self.distance
+            )
 
-            pace_minutes = int(pace // 60)
-            pace_seconds = int(pace % 60)
+            pace_minutes = int(
+                pace // 60
+            )
+
+            pace_seconds = int(
+                pace % 60
+            )
 
             pace_text = (
                 f"{pace_minutes:02d}:"
@@ -149,8 +196,16 @@ class RunScreen(BoxLayout):
             )
 
         else:
+
             pace_text = "--:-- /km"
 
-        xp = int(self.distance * 100)
+        xp = int(
+            self.distance * 100
+        )
 
-        return time, self.distance, pace_text, xp
+        return (
+            time,
+            self.distance,
+            pace_text,
+            xp
+        )

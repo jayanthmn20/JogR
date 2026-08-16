@@ -13,6 +13,7 @@ package.name = jogr
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = com.jayanth
+services = gpsforeground:services/gps_foreground_service.py:foreground:foregroundServiceType=location
 
 # (str) Source code where the main.py live
 source.dir = .
@@ -44,7 +45,7 @@ version = 0.1
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
 requirements = python3,kivy,plyer
-android.permissions = ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION
+android.permissions = ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, FOREGROUND_SERVICE, FOREGROUND_SERVICE_LOCATION
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes

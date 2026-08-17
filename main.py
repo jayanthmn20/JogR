@@ -7,6 +7,7 @@ from screens.home_screen import HomeScreen
 from screens.run_screen import RunScreen
 from screens.result_screen import ResultScreen
 from screens.history_screen import HistoryScreen
+from screens.stats_screen import StatsScreen
 
 from models.player import Player
 from services.storage import save_player, load_player, save_run
@@ -36,6 +37,7 @@ class JogRApp(App):
         self.run_widget = None
         self.result_widget = None
         self.history_widget = None
+        self.stats_widget = None
 
     def build(self):
 
@@ -45,11 +47,13 @@ class JogRApp(App):
         run_screen = Screen(name="run")
         result_screen = Screen(name="result")
         history_screen = Screen(name="history")
+        stats_screen = Screen(name="stats")
 
         self.home_widget = HomeScreen(
             player=self.player,
             go_to_run_screen=lambda instance: self.go_to_run(manager),
-            go_to_history_screen=lambda instance: self.go_to_history(manager)
+            go_to_history_screen=lambda instance: self.go_to_history(manager),
+            go_to_stats_screen=lambda instance: self.go_to_stats(manager)
         )
 
         self.run_widget = RunScreen(
@@ -64,15 +68,21 @@ class JogRApp(App):
             go_to_home_screen=lambda instance: self.go_to_home(manager)
         )
 
+        self.stats_widget = StatsScreen(
+            go_to_home_screen=lambda instance: self.go_to_home(manager)
+        )
+
         home_screen.add_widget(self.home_widget)
         run_screen.add_widget(self.run_widget)
         result_screen.add_widget(self.result_widget)
         history_screen.add_widget(self.history_widget)
+        stats_screen.add_widget(self.stats_widget)
 
         manager.add_widget(home_screen)
         manager.add_widget(run_screen)
         manager.add_widget(result_screen)
         manager.add_widget(history_screen)
+        manager.add_widget(stats_screen)
 
         return manager
 
@@ -129,6 +139,12 @@ class JogRApp(App):
         self.history_widget.refresh()
 
         manager.current = "history"
+
+    def go_to_stats(self, manager):
+
+        self.stats_widget.refresh()
+
+        manager.current = "stats"
 
 
 if __name__ == "__main__":

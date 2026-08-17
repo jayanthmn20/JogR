@@ -6,6 +6,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from screens.home_screen import HomeScreen
 from screens.run_screen import RunScreen
 from screens.result_screen import ResultScreen
+from screens.history_screen import HistoryScreen
 
 from models.player import Player
 from services.storage import save_player, load_player, save_run
@@ -34,6 +35,7 @@ class JogRApp(App):
         self.home_widget = None
         self.run_widget = None
         self.result_widget = None
+        self.history_widget = None
 
     def build(self):
 
@@ -42,10 +44,12 @@ class JogRApp(App):
         home_screen = Screen(name="home")
         run_screen = Screen(name="run")
         result_screen = Screen(name="result")
+        history_screen = Screen(name="history")
 
         self.home_widget = HomeScreen(
             player=self.player,
-            go_to_run_screen=lambda instance: self.go_to_run(manager)
+            go_to_run_screen=lambda instance: self.go_to_run(manager),
+            go_to_history_screen=lambda instance: self.go_to_history(manager)
         )
 
         self.run_widget = RunScreen(
@@ -56,13 +60,19 @@ class JogRApp(App):
             go_to_home_screen=lambda instance: self.go_to_home(manager)
         )
 
+        self.history_widget = HistoryScreen(
+            go_to_home_screen=lambda instance: self.go_to_home(manager)
+        )
+
         home_screen.add_widget(self.home_widget)
         run_screen.add_widget(self.run_widget)
         result_screen.add_widget(self.result_widget)
+        history_screen.add_widget(self.history_widget)
 
         manager.add_widget(home_screen)
         manager.add_widget(run_screen)
         manager.add_widget(result_screen)
+        manager.add_widget(history_screen)
 
         return manager
 
@@ -113,6 +123,12 @@ class JogRApp(App):
         self.home_widget.update_stats()
 
         manager.current = "home"
+
+    def go_to_history(self, manager):
+
+        self.history_widget.refresh()
+
+        manager.current = "history"
 
 
 if __name__ == "__main__":

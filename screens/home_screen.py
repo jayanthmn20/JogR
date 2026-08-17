@@ -5,7 +5,7 @@ from kivy.uix.label import Label
 
 class HomeScreen(BoxLayout):
 
-    def __init__(self, player, go_to_run_screen, **kwargs):
+    def __init__(self, player, go_to_run_screen, go_to_history_screen, **kwargs):
         super().__init__(
             orientation="vertical",
             padding=50,
@@ -45,10 +45,20 @@ class HomeScreen(BoxLayout):
             on_press=go_to_run_screen
         )
 
+        history_button = Button(
+            text="RUN HISTORY",
+            font_size=22
+        )
+
+        history_button.bind(
+            on_press=go_to_history_screen
+        )
+
         self.add_widget(self.title)
         self.add_widget(self.level_label)
         self.add_widget(self.xp_label)
         self.add_widget(start_button)
+        self.add_widget(history_button)
         self.add_widget(self.runs_label)
         self.add_widget(self.distance_label)
 

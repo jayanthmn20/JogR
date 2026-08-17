@@ -175,19 +175,21 @@ class RunScreen(BoxLayout):
             f"{minutes:02d}:{seconds:02d}"
         )
 
+        pace_seconds_per_km = None
+
         if self.distance > 0:
 
-            pace = (
+            pace_seconds_per_km = (
                 self.seconds
                 / self.distance
             )
 
             pace_minutes = int(
-                pace // 60
+                pace_seconds_per_km // 60
             )
 
             pace_seconds = int(
-                pace % 60
+                pace_seconds_per_km % 60
             )
 
             pace_text = (
@@ -205,7 +207,9 @@ class RunScreen(BoxLayout):
 
         return (
             time,
+            self.seconds,
             self.distance,
             pace_text,
+            pace_seconds_per_km,
             xp
         )

@@ -8,7 +8,7 @@ from screens.run_screen import RunScreen
 from screens.result_screen import ResultScreen
 
 from models.player import Player
-from services.storage import save_player, load_player
+from services.storage import save_player, load_player, save_run
 
 
 class JogRApp(App):
@@ -76,9 +76,14 @@ class JogRApp(App):
 
         self.run_widget.stop_timer()
 
-        time, distance, pace, xp = (
-            self.run_widget.get_results()
-        )
+        (
+            time,
+            duration_seconds,
+            distance,
+            pace,
+            pace_seconds_per_km,
+            xp
+        ) = self.run_widget.get_results()
 
         self.player.add_run(
             distance,
@@ -86,6 +91,13 @@ class JogRApp(App):
         )
 
         save_player(self.player)
+
+        save_run(
+            duration_seconds,
+            distance,
+            pace_seconds_per_km,
+            xp
+        )
 
         self.result_widget.show_results(
             time,

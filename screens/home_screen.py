@@ -116,9 +116,25 @@ class HomeScreen(BoxLayout):
 
         current_streak, best_streak = get_streaks()
 
+        current_unit = self._format_days(
+            current_streak
+        )
+
+        best_unit = self._format_days(
+            best_streak
+        )
+
         self.current_streak_label.text = (
-            f"CURRENT STREAK: {current_streak} DAYS"
+            f"CURRENT STREAK: "
+            f"{current_streak} {current_unit}"
         )
+
         self.best_streak_label.text = (
-            f"BEST STREAK: {best_streak} DAYS"
+            f"BEST STREAK: "
+            f"{best_streak} {best_unit}"
         )
+
+    @staticmethod
+    def _format_days(days):
+
+        return "DAY" if days == 1 else "DAYS"

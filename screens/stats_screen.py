@@ -69,6 +69,27 @@ class StatsScreen(BoxLayout):
             on_press=go_to_home_screen
         )
 
+        current_unit = (
+            "DAY"
+            if current_streak == 1
+            else "DAYS"
+        )
+        best_unit = (
+            "DAY"
+            if best_streak == 1
+            else "DAYS"
+        )
+
+        self.current_streak_label.text = (
+            f"CURRENT STREAK: "
+            f"{current_streak} {current_unit}"
+        )
+
+        self.best_streak_label.text = (
+            f"BEST STREAK: "
+            f"{best_streak} {best_unit}"
+        )
+
         self.add_widget(title)
         self.add_widget(self.runs_label)
         self.add_widget(self.distance_label)

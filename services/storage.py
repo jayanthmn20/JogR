@@ -124,38 +124,75 @@ def _migrate_old_data():
 _migrate_old_data()
 
 
-def save_player(player):
+def _atomic_write_json(
+    file_path,
+    data
+):
 
-    data = {
-        "name": player.name,
-        "level": player.level,
-        "xp": player.xp,
-        "total_distance": player.total_distance,
-        "total_runs": player.total_runs
-    }
-
-    with open(
-        SAVE_FILE,
-        "w",
-        encoding="utf-8"
-    ) as file:
-
-        json.dump(
-            data,
-            file,
-            indent=4
-        )
-
-
-def load_player():
-
-    if not os.path.exists(SAVE_FILE):
-        return None
+    temp_file = (
+        file_path
+        + ".tmp"
+    )
 
     try:
 
         with open(
-            SAVE_FILE,
+            temp_file,
+            "w",
+            encoding="utf-8"
+        ) as file:
+
+            json.dump(
+                data,
+                file,
+                indent=4
+            )
+
+            file.flush()
+
+            os.fsync(
+                file.fileno()
+            )
+
+        os.replace(
+            temp_file,
+            file_path
+        )
+
+    except Exception:
+
+        if os.path.exists(
+            temp_file
+        ):
+
+            try:
+
+                os.remove(
+                    temp_file
+                )
+
+            except OSError:
+
+                pass
+
+        raise
+
+
+def _load_json(
+    file_path,
+    default=None
+):
+
+    if not os.path.exists(
+        file_path
+    ):
+
+        return default
+
+    try:
+
+        with open(
+            file_path,
             "r",
             encoding="utf-8"
         ) as file:
@@ -167,7 +204,31 @@ def load_player():
         OSError
     ):
 
-        return None
+        return default
+
+
+def save_player(player):
+
+    data = {
+        "name": player.name,
+        "level": player.level,
+        "xp": player.xp,
+        "total_distance": player.total_distance,
+        "total_runs": player.total_runs
+    }
+
+    _atomic_write_json(
+        SAVE_FILE,
+        data
+    )
+
+
+def load_player():
+
+    return _load_json(
+        SAVE_FILE,
+        None
+    )
 
 
 def save_run(
@@ -199,44 +260,28 @@ def save_run(
         "xp": xp
     }
 
-    runs.append(run)
+    runs.append(
+        run
+    )
 
-    with open(
+    _atomic_write_json(
         RUNS_FILE,
-        "w",
-        encoding="utf-8"
-    ) as file:
-
-        json.dump(
-            runs,
-            file,
-            indent=4
-        )
+        runs
+    )
 
 
 def load_runs():
 
-    if not os.path.exists(RUNS_FILE):
-        return []
+    data = _load_json(
+        RUNS_FILE,
+        []
+    )
 
-    try:
-
-        with open(
-            RUNS_FILE,
-            "r",
-            encoding="utf-8"
-        ) as file:
-
-            data = json.load(file)
-
-        if isinstance(data, list):
-            return data
-
-    except (
-        json.JSONDecodeError,
-        OSError
+    if isinstance(
+        data,
+        list
     ):
 
-        pass
+        return data
 
     return []

@@ -1,7 +1,7 @@
 import json
 import os
 import shutil
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from jnius import autoclass
 
@@ -285,3 +285,76 @@ def load_runs():
         return data
 
     return []
+
+
+def get_streaks():
+
+    runs = load_runs()
+
+    if not runs:
+        return 0, 0
+
+    dates = set()
+
+    for run in runs:
+
+        date_text = run.get("date")
+
+        if not date_text:
+            continue
+
+        try:
+
+            run_date = datetime.strptime(
+                date_text,
+                "%Y-%m-%d %H:%M:%S"
+            ).date()
+
+            dates.add(run_date)
+
+        except ValueError:
+
+            continue
+
+    if not dates:
+        return 0, 0
+
+
+    today = datetime.now().date()
+
+    current_streak = 0
+    check_date = today
+    while check_date in dates:
+
+        current_streak += 1
+
+
+        check_date -= timedelta(days=1)
+
+    best_streak = 1
+    streak = 1
+
+    ascending_dates = sorted(dates)
+
+    for index in range(
+        1,
+        len(ascending_dates)
+    ):
+
+        difference = (
+            ascending_dates[index]
+            - ascending_dates[index - 1]
+        ).days
+
+        if difference == 1:
+
+            streak += 1
+
+        else:
+
+            streak = 1
+
+        if streak > best_streak:
+            best_streak = streak
+
+    return current_streak, best_streak

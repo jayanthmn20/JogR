@@ -2,7 +2,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 
-from services.storage import load_runs
+from services.storage import load_runs, get_streaks
 
 
 class StatsScreen(BoxLayout):
@@ -50,6 +50,14 @@ class StatsScreen(BoxLayout):
             font_size=24
         )
 
+        self.current_streak_label = Label(
+            font_size=24
+        )
+
+        self.best_streak_label = Label(
+            font_size=24
+        )
+
         home_button = Button(
             text="BACK TO HOME",
             font_size=22,
@@ -70,12 +78,25 @@ class StatsScreen(BoxLayout):
         self.add_widget(self.longest_run_label)
         self.add_widget(self.xp_label)
         self.add_widget(home_button)
+        self.add_widget(self.current_streak_label)
+        self.add_widget(self.best_streak_label)
+
 
         self.refresh()
 
     def refresh(self):
 
         runs = load_runs()
+        current_streak, best_streak = get_streaks()
+
+        self.current_streak_label.text = (
+            f"CURRENT STREAK: {current_streak} DAYS"
+        )
+
+        self.best_streak_label.text = (
+            f"BEST STREAK: {best_streak} DAYS"
+        )
+
 
         if not runs:
 

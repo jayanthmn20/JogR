@@ -2,6 +2,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 
+from services.storage import get_streaks
 
 class HomeScreen(BoxLayout):
 
@@ -43,6 +44,14 @@ class HomeScreen(BoxLayout):
             font_size=20
         )
 
+        self.current_streak_label = Label(
+            font_size=20
+        )
+
+        self.best_streak_label = Label(
+            font_size=20
+        )
+
         start_button = Button(
             text="START RUN",
             font_size=25
@@ -70,6 +79,8 @@ class HomeScreen(BoxLayout):
             on_press=go_to_stats_screen
         )
 
+        self.add_widget(self.current_streak_label)
+        self.add_widget(self.best_streak_label)
         self.add_widget(self.title)
         self.add_widget(self.level_label)
         self.add_widget(self.xp_label)
@@ -79,7 +90,9 @@ class HomeScreen(BoxLayout):
         self.add_widget(self.runs_label)
         self.add_widget(self.distance_label)
 
+
         self.update_stats()
+
 
     def update_stats(self):
 
@@ -99,4 +112,13 @@ class HomeScreen(BoxLayout):
         self.distance_label.text = (
             f"DISTANCE: "
             f"{self.player.total_distance:.2f} km"
+        )
+
+        current_streak, best_streak = get_streaks()
+
+        self.current_streak_label.text = (
+            f"CURRENT STREAK: {current_streak} DAYS"
+        )
+        self.best_streak_label.text = (
+            f"BEST STREAK: {best_streak} DAYS"
         )

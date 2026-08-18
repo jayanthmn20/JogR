@@ -9,11 +9,14 @@ from kivy.clock import Clock
 class GPSService:
 
     def __init__(self, on_location=None):
+
         self.on_location = on_location
         self.running = False
+        self.paused = False
         self.distance = 0.0
 
         self.state_file = None
+        self.control_file = None
         self._poll_event = None
 
     def start(self):
@@ -26,20 +29,33 @@ class GPSService:
             self._permission_callback
         )
 
-    def _permission_callback(self, permissions, grants):
+    def _permission_callback(
+        self,
+        permissions,
+        grants
+    ):
 
         if not all(grants):
-            print("GPS PERMISSION DENIED")
+
+            print(
+                "GPS PERMISSION DENIED"
+            )
+
             return
 
-        print("GPS PERMISSION GRANTED")
+        print(
+            "GPS PERMISSION GRANTED"
+        )
 
         Clock.schedule_once(
             self._start_foreground_service,
             0.5
         )
 
-    def _start_foreground_service(self, dt):
+    def _start_foreground_service(
+        self,
+        dt
+    ):
 
         try:
 
@@ -59,7 +75,8 @@ class GPSService:
             )
 
             files_dir = (
-                activity.getFilesDir()
+                activity
+                .getFilesDir()
                 .getAbsolutePath()
             )
 
@@ -68,7 +85,13 @@ class GPSService:
                 "jogr_run_state.json"
             )
 
+            self.control_file = os.path.join(
+                files_dir,
+                "jogr_run_control.json"
+            )
+
             self.running = True
+            self.paused = False
             self.distance = 0.0
 
             print(
@@ -79,9 +102,11 @@ class GPSService:
                 self._poll_state
             )
 
-            self._poll_event = Clock.schedule_interval(
-                self._poll_state,
-                1
+            self._poll_event = (
+                Clock.schedule_interval(
+                    self._poll_state,
+                    1
+                )
             )
 
         except Exception as e:
@@ -104,6 +129,7 @@ class GPSService:
             if not os.path.exists(
                 self.state_file
             ):
+
                 return
 
             with open(
@@ -113,6 +139,13 @@ class GPSService:
             ) as file:
 
                 state = json.load(file)
+
+            self.paused = bool(
+                state.get(
+                    "paused",
+                    self.paused
+                )
+            )
 
             self.distance = float(
                 state.get(
@@ -180,6 +213,7 @@ class GPSService:
             if not os.path.exists(
                 self.state_file
             ):
+
                 return
 
             with open(
@@ -189,6 +223,13 @@ class GPSService:
             ) as file:
 
                 state = json.load(file)
+
+            self.paused = bool(
+                state.get(
+                    "paused",
+                    self.paused
+                )
+            )
 
             self.distance = float(
                 state.get(
@@ -204,10 +245,81 @@ class GPSService:
                 repr(e)
             )
 
+    def _write_control(self, paused):
+
+        if not self.control_file:
+            return
+
+        control = {
+            "paused": paused
+        }
+
+        temp_file = (
+            self.control_file
+            + ".tmp"
+        )
+
+        try:
+
+            with open(
+                temp_file,
+                "w",
+                encoding="utf-8"
+            ) as file:
+
+                json.dump(
+                    control,
+                    file
+                )
+
+            os.replace(
+                temp_file,
+                self.control_file
+            )
+
+        except Exception as e:
+
+            print(
+                "GPS CONTROL WRITE ERROR:",
+                repr(e)
+            )
+
+    def pause(self):
+
+        if not self.running:
+            return
+
+        self._write_control(
+            paused=True
+        )
+
+        self.paused = True
+
+        print(
+            "GPS PAUSED"
+        )
+
+    def resume(self):
+
+        if not self.running:
+            return
+
+        self._write_control(
+            paused=False
+        )
+
+        self.paused = False
+
+        print(
+            "GPS RESUMED"
+        )
+
     def stop(self):
 
         if self._poll_event:
+
             self._poll_event.cancel()
+
             self._poll_event = None
 
         Clock.unschedule(
@@ -237,7 +349,9 @@ class GPSService:
                     ServiceGPS
                 )
 
-                activity.stopService(intent)
+                activity.stopService(
+                    intent
+                )
 
                 print(
                     "GPS FOREGROUND SERVICE STOPPED"
@@ -253,3 +367,4 @@ class GPSService:
         self._read_state()
 
         self.running = False
+        self.paused = False

@@ -13,6 +13,14 @@ class LocationService:
         self.last_location = None
         self.total_distance = 0.0
 
+    def pause(self):
+        self.running = False
+        self.last_location = None
+
+    def resume(self):
+        self.running = True
+        self.last_location = None
+
     def stop(self):
         self.running = False
         self.last_location = None
@@ -21,9 +29,13 @@ class LocationService:
         if not self.running:
             return
 
-        current_location = (latitude, longitude)
+        current_location = (
+            latitude,
+            longitude
+        )
 
         if self.last_location is not None:
+
             distance = self._calculate_distance(
                 self.last_location,
                 current_location
@@ -37,7 +49,10 @@ class LocationService:
         return self.total_distance
 
     @staticmethod
-    def _calculate_distance(location1, location2):
+    def _calculate_distance(
+        location1,
+        location2
+    ):
         earth_radius = 6371.0
 
         lat1, lon1 = location1
@@ -58,6 +73,9 @@ class LocationService:
             * sin(delta_lon / 2) ** 2
         )
 
-        c = 2 * atan2(sqrt(a), sqrt(1 - a))
+        c = 2 * atan2(
+            sqrt(a),
+            sqrt(1 - a)
+        )
 
         return earth_radius * c

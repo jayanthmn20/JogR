@@ -1,6 +1,7 @@
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
+from kivy.uix.progressbar import ProgressBar
 
 from services.storage import get_streaks
 
@@ -34,6 +35,11 @@ class HomeScreen(BoxLayout):
 
         self.xp_label = Label(
             font_size=22
+        )
+
+        self.xp_progress = ProgressBar(
+            max=self.player.xp_required(),
+            value=self.player.xp
         )
 
         self.runs_label = Label(
@@ -84,6 +90,7 @@ class HomeScreen(BoxLayout):
         self.add_widget(self.title)
         self.add_widget(self.level_label)
         self.add_widget(self.xp_label)
+        self.add_widget(self.xp_progress)
         self.add_widget(start_button)
         self.add_widget(history_button)
         self.add_widget(stats_button)
@@ -103,6 +110,14 @@ class HomeScreen(BoxLayout):
         self.xp_label.text = (
             f"{self.player.xp} / "
             f"{self.player.xp_required()} XP"
+        )
+
+        self.xp_progress.max = (
+            self.player.xp_required()
+        )
+
+        self.xp_progress.value = (
+            self.player.xp
         )
 
         self.runs_label.text = (

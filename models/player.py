@@ -7,6 +7,14 @@ class Player:
         self.total_distance = 0.0
         self.total_runs = 0
 
+    @staticmethod
+    def calculate_run_xp(distance):
+
+        return int(
+            distance * 50
+        )
+
+
     def add_run(self, distance, xp):
 
         self.total_distance += distance

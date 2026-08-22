@@ -5,7 +5,7 @@ from kivy.uix.label import Label
 from jnius import autoclass
 
 from services.gps_service import GPSService
-
+from models.player import Player
 
 class RunScreen(BoxLayout):
 
@@ -350,8 +350,8 @@ class RunScreen(BoxLayout):
 
             pace_text = "--:-- /km"
 
-        xp = int(
-            self.distance * 100
+        xp = Player.calculate_run_xp(
+            self.distance
         )
 
         return (

@@ -25,8 +25,16 @@ class LocationService:
         self.running = False
         self.last_location = None
 
-    def update_location(self, latitude, longitude):
+    def update_location(
+        self,
+        latitude,
+        longitude,
+        accuracy
+    ):
         if not self.running:
+            return
+
+        if accuracy > 25:
             return
 
         current_location = (

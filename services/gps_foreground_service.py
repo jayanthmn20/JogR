@@ -205,7 +205,8 @@ class GPSForegroundService:
 
         self.location_service.update_location(
             latitude,
-            longitude
+            longitude,
+            accuracy
         )
 
         distance = (

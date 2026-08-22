@@ -38,6 +38,26 @@ class ResultScreen(BoxLayout):
             font_size=25
         )
 
+        self.level_up_label = Label(
+            text="",
+            font_size=28
+        )
+
+        self.level_label = Label(
+            text="",
+            font_size=25
+        )
+
+        self.xp_progress_label = Label(
+            text="",
+            font_size=22
+        )
+
+        self.xp_remaining_label = Label(
+            text="",
+            font_size=20
+        )
+
         home_button = Button(
             text="BACK TO HOME",
             font_size=25
@@ -52,9 +72,23 @@ class ResultScreen(BoxLayout):
         self.add_widget(self.distance_label)
         self.add_widget(self.pace_label)
         self.add_widget(self.xp_label)
+        self.add_widget(self.level_up_label)
+        self.add_widget(self.level_label)
+        self.add_widget(self.xp_progress_label)
+        self.add_widget(self.xp_remaining_label)
         self.add_widget(home_button)
 
-    def show_results(self, time, distance, pace, xp):
+    def show_results(
+            self,
+            time,
+            distance,
+            pace,
+            xp,
+            level_result,
+            level,
+            current_xp,
+            xp_required
+    ):
 
         self.time_label.text = (
             f"Time: {time}"
@@ -70,4 +104,33 @@ class ResultScreen(BoxLayout):
 
         self.xp_label.text = (
             f"XP Earned: +{xp}"
+        )
+
+        if level_result["level_up"]:
+            self.level_up_label.text = (
+                f"LEVEL UP! "
+                f"{level_result['old_level']} "
+                f"→ "
+                f"{level_result['new_level']}"
+            )
+
+        else:
+
+            self.level_up_label.text = ""
+
+        self.level_label.text = (
+            f"LEVEL {level}"
+        )
+
+        self.xp_progress_label.text = (
+            f"{current_xp} / {xp_required} XP"
+        )
+
+        remaining_xp = (
+            xp_required - current_xp
+        )
+
+        self.xp_remaining_label.text = (
+            f"{remaining_xp} XP TO LEVEL "
+            f"{level + 1}"
         )

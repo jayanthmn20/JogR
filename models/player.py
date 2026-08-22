@@ -12,9 +12,11 @@ class Player:
         self.total_distance += distance
         self.total_runs += 1
 
-        self.add_xp(xp)
+        return self.add_xp(xp)
 
     def add_xp(self, xp):
+
+        old_level = self.level
 
         self.xp += xp
 
@@ -22,6 +24,12 @@ class Player:
 
             self.xp -= self.xp_required()
             self.level += 1
+
+        return {
+            "old_level": old_level,
+            "new_level": self.level,
+            "level_up": self.level > old_level
+        }
 
     def xp_required(self):
 

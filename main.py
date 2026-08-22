@@ -105,7 +105,7 @@ class JogRApp(App):
             xp
         ) = self.run_widget.get_results()
 
-        self.player.add_run(
+        level_result = self.player.add_run(
             distance,
             xp
         )
@@ -123,7 +123,11 @@ class JogRApp(App):
             time,
             distance,
             pace,
-            xp
+            xp,
+            level_result,
+            self.player.level,
+            self.player.xp,
+            self.player.xp_required()
         )
 
         manager.current = "result"

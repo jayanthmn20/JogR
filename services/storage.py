@@ -213,8 +213,10 @@ def save_player(player):
         "name": player.name,
         "level": player.level,
         "xp": player.xp,
+        "total_xp": player.total_xp,
         "total_distance": player.total_distance,
-        "total_runs": player.total_runs
+        "total_runs": player.total_runs,
+        "achievements": player.achievements
     }
 
     _atomic_write_json(

@@ -4,8 +4,10 @@ class Player:
         self.name = name
         self.level = 1
         self.xp = 0
+        self.total_xp = 0
         self.total_distance = 0.0
         self.total_runs = 0
+        self.achievements = []
 
     @staticmethod
     def calculate_run_xp(distance):
@@ -27,6 +29,7 @@ class Player:
         old_level = self.level
 
         self.xp += xp
+        self.total_xp += xp
 
         while self.xp >= self.xp_required():
 

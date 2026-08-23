@@ -10,7 +10,8 @@ from screens.history_screen import HistoryScreen
 from screens.stats_screen import StatsScreen
 
 from models.player import Player
-from services.storage import save_player, load_player, save_run
+from models.achievements import Achievement
+from services.storage import save_player, load_player, save_run, get_streaks
 
 
 class JogRApp(App):
@@ -27,8 +28,16 @@ class JogRApp(App):
 
             self.player.level = saved_data["level"]
             self.player.xp = saved_data["xp"]
+            self.player.total_xp = saved_data.get(
+                "total_xp",
+                saved_data["xp"]
+            )
             self.player.total_distance = saved_data["total_distance"]
             self.player.total_runs = saved_data["total_runs"]
+            self.player.achievements = saved_data.get(
+                "achievements",
+                []
+            )
 
         else:
             self.player = Player()
@@ -119,6 +128,32 @@ class JogRApp(App):
             xp
         )
 
+        current_streak, _ = get_streaks()
+
+        unlocked_achievements = (
+            Achievement.check_unlocked(
+                self.player,
+                current_streak
+            )
+        )
+
+        new_achievements = []
+
+        for achievement in unlocked_achievements:
+
+            if achievement["id"] not in self.player.achievements:
+
+                self.player.achievements.append(
+                    achievement["id"]
+                )
+
+                new_achievements.append(
+                    achievement
+                )
+
+        if new_achievements:
+            save_player(self.player)
+
         self.result_widget.show_results(
             time,
             distance,
@@ -127,7 +162,8 @@ class JogRApp(App):
             level_result,
             self.player.level,
             self.player.xp,
-            self.player.xp_required()
+            self.player.xp_required(),
+            new_achievements
         )
 
         manager.current = "result"

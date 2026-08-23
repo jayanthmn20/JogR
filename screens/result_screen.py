@@ -58,6 +58,11 @@ class ResultScreen(BoxLayout):
             font_size=20
         )
 
+        self.achievement_label = Label(
+            text="",
+            font_size=22
+        )
+
         home_button = Button(
             text="BACK TO HOME",
             font_size=25
@@ -76,6 +81,7 @@ class ResultScreen(BoxLayout):
         self.add_widget(self.level_label)
         self.add_widget(self.xp_progress_label)
         self.add_widget(self.xp_remaining_label)
+        self.add_widget(self.achievement_label)
         self.add_widget(home_button)
 
     def show_results(
@@ -87,7 +93,8 @@ class ResultScreen(BoxLayout):
             level_result,
             level,
             current_xp,
-            xp_required
+            xp_required,
+            new_achievements
     ):
 
         self.time_label.text = (
@@ -134,3 +141,17 @@ class ResultScreen(BoxLayout):
             f"{remaining_xp} XP TO LEVEL "
             f"{level + 1}"
         )
+
+        if new_achievements:
+
+            achievement = new_achievements[0]
+
+            self.achievement_label.text = (
+                f"ACHIEVEMENT UNLOCKED!\n"
+                f"{achievement['title']}\n"
+                f"{achievement['description']}"
+            )
+
+        else:
+
+            self.achievement_label.text = ""

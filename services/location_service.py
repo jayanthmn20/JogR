@@ -3,6 +3,9 @@ from math import radians, sin, cos, sqrt, atan2
 
 class LocationService:
 
+    MIN_MOVEMENT_METERS = 5.0
+    MAX_ACCURACY_METERS = 25.0
+
     def __init__(self):
         self.running = False
         self.last_location = None
@@ -34,7 +37,7 @@ class LocationService:
         if not self.running:
             return
 
-        if accuracy > 25:
+        if accuracy > self.MAX_ACCURACY_METERS:
             return
 
         current_location = (
@@ -42,16 +45,21 @@ class LocationService:
             longitude
         )
 
-        if self.last_location is not None:
+        if self.last_location is None:
+            self.last_location = current_location
+            return
 
-            distance = self._calculate_distance(
-                self.last_location,
-                current_location
-            )
-
-            self.total_distance += distance
+        distance = self._calculate_distance(
+            self.last_location,
+            current_location
+        )
 
         self.last_location = current_location
+
+        if distance * 1000 < self.MIN_MOVEMENT_METERS:
+            return
+
+        self.total_distance += distance
 
     def get_distance(self):
         return self.total_distance

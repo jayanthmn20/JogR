@@ -150,9 +150,7 @@ class JogRApp(App):
                 new_achievements.append(
                     achievement
                 )
-
-        if new_achievements:
-            save_player(self.player)
+        save_player(self.player)
 
         self.result_widget.show_results(
             time,

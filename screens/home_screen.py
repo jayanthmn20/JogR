@@ -14,6 +14,7 @@ class HomeScreen(BoxLayout):
         go_to_history_screen,
         go_to_stats_screen,
         go_to_achievements_screen,
+        go_to_missions_screen,
         **kwargs
     ):
         super().__init__(
@@ -95,6 +96,15 @@ class HomeScreen(BoxLayout):
             on_press=go_to_achievements_screen
         )
 
+        missions_button = Button(
+            text="DAILY MISSIONS",
+            font_size=22
+        )
+
+        missions_button.bind(
+            on_press=go_to_missions_screen
+        )
+
         self.add_widget(self.current_streak_label)
         self.add_widget(self.best_streak_label)
         self.add_widget(self.title)
@@ -105,6 +115,7 @@ class HomeScreen(BoxLayout):
         self.add_widget(history_button)
         self.add_widget(stats_button)
         self.add_widget(achievements_button)
+        self.add_widget(missions_button)
         self.add_widget(self.runs_label)
         self.add_widget(self.distance_label)
 

@@ -9,10 +9,12 @@ from screens.result_screen import ResultScreen
 from screens.history_screen import HistoryScreen
 from screens.stats_screen import StatsScreen
 from screens.achievements_screen import AchievementsScreen
+from screens.missions_screen import MissionsScreen
 
 from models.player import Player
 from models.achievements import Achievement
-from services.storage import save_player, load_player, save_run, get_streaks
+from models.missions import Mission
+from services.storage import save_player, load_player, save_run, load_runs, get_streaks
 
 
 class JogRApp(App):
@@ -39,6 +41,10 @@ class JogRApp(App):
                 "achievements",
                 []
             )
+            self.player.mission_claims = saved_data.get(
+                "mission_claims",
+                {}
+            )
 
         else:
             self.player = Player()
@@ -49,6 +55,8 @@ class JogRApp(App):
         self.history_widget = None
         self.stats_widget = None
         self.achievements_widget = None
+        self.missions_widget = None
+
 
     def build(self):
 
@@ -60,13 +68,15 @@ class JogRApp(App):
         history_screen = Screen(name="history")
         stats_screen = Screen(name="stats")
         achievements_screen = Screen(name="achievements")
+        missions_screen = Screen(name="missions")
 
         self.home_widget = HomeScreen(
             player=self.player,
             go_to_run_screen=lambda instance: self.go_to_run(manager),
             go_to_history_screen=lambda instance: self.go_to_history(manager),
             go_to_stats_screen=lambda instance: self.go_to_stats(manager),
-            go_to_achievements_screen=lambda instance: self.go_to_achievements(manager)
+            go_to_achievements_screen=lambda instance: self.go_to_achievements(manager),
+            go_to_missions_screen=lambda instance: self.go_to_missions(manager)
         )
 
         self.run_widget = RunScreen(
@@ -90,12 +100,19 @@ class JogRApp(App):
             go_to_home_screen=lambda instance: self.go_to_home(manager)
         )
 
+        self.missions_widget = MissionsScreen(
+            player=self.player,
+            claim_mission=self.claim_mission,
+            go_to_home_screen=lambda instance: self.go_to_home(manager)
+        )
+
         home_screen.add_widget(self.home_widget)
         run_screen.add_widget(self.run_widget)
         result_screen.add_widget(self.result_widget)
         history_screen.add_widget(self.history_widget)
         stats_screen.add_widget(self.stats_widget)
         achievements_screen.add_widget(self.achievements_widget)
+        missions_screen.add_widget(self.missions_widget)
 
         manager.add_widget(home_screen)
         manager.add_widget(run_screen)
@@ -103,6 +120,7 @@ class JogRApp(App):
         manager.add_widget(history_screen)
         manager.add_widget(stats_screen)
         manager.add_widget(achievements_screen)
+        manager.add_widget(missions_screen)
 
         return manager
 
@@ -183,6 +201,51 @@ class JogRApp(App):
 
         manager.current = "home"
 
+    def claim_mission(self, mission_id):
+
+        runs = load_runs()
+
+        if not Mission.is_complete(
+            mission_id,
+            runs
+        ):
+            return False
+
+        today = Mission.today()
+
+        if self.player.is_mission_claimed(
+            today,
+            mission_id
+        ):
+            return False
+
+        reward = 0
+
+        for mission in Mission.DEFINITIONS:
+
+            if mission["id"] == mission_id:
+                reward = mission["reward"]
+                break
+
+        if reward <= 0:
+            return False
+
+        if not self.player.claim_mission(
+            today,
+            mission_id
+        ):
+            return False
+
+        self.player.add_xp(
+            reward
+        )
+
+        save_player(
+            self.player
+        )
+
+        return True
+
     def go_to_history(self, manager):
 
         self.history_widget.refresh()
@@ -201,6 +264,10 @@ class JogRApp(App):
 
         manager.current = "stats"
 
+    def go_to_missions(self, manager):
+        self.missions_widget.refresh()
+
+        manager.current = "missions"
 
 if __name__ == "__main__":
     JogRApp().run()

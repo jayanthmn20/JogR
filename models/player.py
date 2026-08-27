@@ -9,6 +9,7 @@ class Player:
         self.total_runs = 0
         self.achievements = []
         self.mission_claims = {}
+        self.streak_rewards = []
 
     @staticmethod
     def calculate_run_xp(distance):
@@ -76,6 +77,28 @@ class Player:
 
         self.mission_claims[date_text].append(
             mission_id
+        )
+
+        return True
+
+    def is_streak_reward_claimed(
+            self,
+            milestone
+    ):
+        return milestone in self.streak_rewards
+
+    def claim_streak_reward(
+            self,
+            milestone
+    ):
+
+        if self.is_streak_reward_claimed(
+            milestone
+        ):
+            return False
+
+        self.streak_rewards.append(
+            milestone
         )
 
         return True

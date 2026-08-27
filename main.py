@@ -46,6 +46,11 @@ class JogRApp(App):
                 {}
             )
 
+            self.player.streak_rewards = saved_data.get(
+                "streak_rewards",
+                []
+            )
+
         else:
             self.player = Player()
 
@@ -143,13 +148,6 @@ class JogRApp(App):
             xp
         ) = self.run_widget.get_results()
 
-        level_result = self.player.add_run(
-            distance,
-            xp
-        )
-
-        save_player(self.player)
-
         save_run(
             duration_seconds,
             distance,
@@ -158,6 +156,25 @@ class JogRApp(App):
         )
 
         current_streak, _ = get_streaks()
+
+        streak_reward = self.check_streak_reward(
+            current_streak
+        )
+
+        total_xp = xp
+
+        if streak_reward is not None:
+            total_xp += streak_reward["reward"]
+
+        level_result = self.player.add_run(
+            distance,
+            total_xp
+        )
+
+        if streak_reward is not None:
+            self.player.claim_streak_reward(
+                streak_reward["milestone"]
+            )
 
         unlocked_achievements = (
             Achievement.check_unlocked(
@@ -179,7 +196,10 @@ class JogRApp(App):
                 new_achievements.append(
                     achievement
                 )
-        save_player(self.player)
+
+        save_player(
+            self.player
+        )
 
         self.result_widget.show_results(
             time,
@@ -190,16 +210,47 @@ class JogRApp(App):
             self.player.level,
             self.player.xp,
             self.player.xp_required(),
-            new_achievements
+            new_achievements,
+            streak_reward
         )
 
         manager.current = "result"
+
+    STREAK_REWARDS = {
+        3: 50,
+        7: 150,
+        14: 300,
+        30: 750
+    }
+
+    def check_streak_reward(
+            self,
+            current_streak
+    ):
+        reward = self.STREAK_REWARDS.get(
+            current_streak
+        )
+
+        if reward is None:
+            return None
+
+        if self.player.is_streak_reward_claimed(
+            current_streak
+        ):
+            return None
+
+        return {
+            "milestone": current_streak,
+            "reward": reward
+        }
 
     def go_to_home(self, manager):
 
         self.home_widget.update_stats()
 
         manager.current = "home"
+
+
 
     def claim_mission(self, mission_id):
 

@@ -217,7 +217,8 @@ def save_player(player):
         "total_distance": player.total_distance,
         "total_runs": player.total_runs,
         "achievements": player.achievements,
-        "mission_claims": player.mission_claims
+        "mission_claims": player.mission_claims,
+        "streak_rewards": player.streak_rewards
     }
 
     _atomic_write_json(

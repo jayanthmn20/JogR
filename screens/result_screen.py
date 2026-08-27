@@ -38,6 +38,11 @@ class ResultScreen(BoxLayout):
             font_size=25
         )
 
+        self.streak_reward_label = Label(
+            text="",
+            font_size=22
+        )
+
         self.level_up_label = Label(
             text="",
             font_size=28
@@ -77,6 +82,7 @@ class ResultScreen(BoxLayout):
         self.add_widget(self.distance_label)
         self.add_widget(self.pace_label)
         self.add_widget(self.xp_label)
+        self.add_widget(self.streak_reward_label)
         self.add_widget(self.level_up_label)
         self.add_widget(self.level_label)
         self.add_widget(self.xp_progress_label)
@@ -94,7 +100,8 @@ class ResultScreen(BoxLayout):
             level,
             current_xp,
             xp_required,
-            new_achievements
+            new_achievements,
+            streak_reward
     ):
 
         self.time_label.text = (
@@ -112,6 +119,16 @@ class ResultScreen(BoxLayout):
         self.xp_label.text = (
             f"XP Earned: +{xp}"
         )
+
+        if streak_reward is not None:
+            self.streak_reward_label.text = (
+                f"STREAK REWARD: "
+                f"+{streak_reward['reward']} XP "
+                f"({streak_reward['milestone']}-DAY STREAK)"
+            )
+
+        else:
+            self.streak_reward_label.text = ""
 
         if level_result["level_up"]:
             self.level_up_label.text = (

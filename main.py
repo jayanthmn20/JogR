@@ -8,6 +8,7 @@ from screens.run_screen import RunScreen
 from screens.result_screen import ResultScreen
 from screens.history_screen import HistoryScreen
 from screens.stats_screen import StatsScreen
+from screens.achievements_screen import AchievementsScreen
 
 from models.player import Player
 from models.achievements import Achievement
@@ -47,6 +48,7 @@ class JogRApp(App):
         self.result_widget = None
         self.history_widget = None
         self.stats_widget = None
+        self.achievements_widget = None
 
     def build(self):
 
@@ -57,12 +59,14 @@ class JogRApp(App):
         result_screen = Screen(name="result")
         history_screen = Screen(name="history")
         stats_screen = Screen(name="stats")
+        achievements_screen = Screen(name="achievements")
 
         self.home_widget = HomeScreen(
             player=self.player,
             go_to_run_screen=lambda instance: self.go_to_run(manager),
             go_to_history_screen=lambda instance: self.go_to_history(manager),
-            go_to_stats_screen=lambda instance: self.go_to_stats(manager)
+            go_to_stats_screen=lambda instance: self.go_to_stats(manager),
+            go_to_achievements_screen=lambda instance: self.go_to_achievements(manager)
         )
 
         self.run_widget = RunScreen(
@@ -81,17 +85,24 @@ class JogRApp(App):
             go_to_home_screen=lambda instance: self.go_to_home(manager)
         )
 
+        self.achievements_widget = AchievementsScreen(
+            player=self.player,
+            go_to_home_screen=lambda instance: self.go_to_home(manager)
+        )
+
         home_screen.add_widget(self.home_widget)
         run_screen.add_widget(self.run_widget)
         result_screen.add_widget(self.result_widget)
         history_screen.add_widget(self.history_widget)
         stats_screen.add_widget(self.stats_widget)
+        achievements_screen.add_widget(self.achievements_widget)
 
         manager.add_widget(home_screen)
         manager.add_widget(run_screen)
         manager.add_widget(result_screen)
         manager.add_widget(history_screen)
         manager.add_widget(stats_screen)
+        manager.add_widget(achievements_screen)
 
         return manager
 
@@ -177,6 +188,12 @@ class JogRApp(App):
         self.history_widget.refresh()
 
         manager.current = "history"
+
+    def go_to_achievements(self, manager):
+
+        self.achievements_widget.refresh()
+
+        manager.current = "achievements"
 
     def go_to_stats(self, manager):
 

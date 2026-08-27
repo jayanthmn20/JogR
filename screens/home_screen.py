@@ -13,6 +13,7 @@ class HomeScreen(BoxLayout):
         go_to_run_screen,
         go_to_history_screen,
         go_to_stats_screen,
+        go_to_achievements_screen,
         **kwargs
     ):
         super().__init__(
@@ -85,6 +86,15 @@ class HomeScreen(BoxLayout):
             on_press=go_to_stats_screen
         )
 
+        achievements_button = Button(
+            text="ACHIEVEMENTS",
+            font_size=22
+        )
+
+        achievements_button.bind(
+            on_press=go_to_achievements_screen
+        )
+
         self.add_widget(self.current_streak_label)
         self.add_widget(self.best_streak_label)
         self.add_widget(self.title)
@@ -94,6 +104,7 @@ class HomeScreen(BoxLayout):
         self.add_widget(start_button)
         self.add_widget(history_button)
         self.add_widget(stats_button)
+        self.add_widget(achievements_button)
         self.add_widget(self.runs_label)
         self.add_widget(self.distance_label)
 

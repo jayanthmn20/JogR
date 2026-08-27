@@ -54,12 +54,11 @@ class LocationService:
             current_location
         )
 
-        self.last_location = current_location
-
         if distance * 1000 < self.MIN_MOVEMENT_METERS:
             return
 
         self.total_distance += distance
+        self.last_location = current_location
 
     def get_distance(self):
         return self.total_distance
